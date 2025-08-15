@@ -206,3 +206,141 @@ img2 = cv.drawKeypoints(img, kp, None, color=(0,255,0), flags=0)
 cv.imshow('features',img2)
 cv.waitKey()
 cv.destroyAllWindows()
+
+
+#cosine functionality
+"""
+length_input_enc = 0
+for element in face_encodings[0]:
+    length_input_enc+= element*element
+
+length_input_enc = math.sqrt(length_input_enc)
+
+print("encode for input",length_input_enc, "\n\n")
+
+dis_encod=0
+arr_dis=[]
+diffence_encod=[]
+
+print("\n\n\n")
+for encodings in known_encodings:
+
+    vec= face_encodings[0]- encodings
+
+
+    diffence_encod.append(vec)
+    vec=0
+
+for element in diffence_encod:
+    print("hello\n")
+    print(element, )
+
+
+
+
+
+dist_vect=[]
+#eucleaden distance
+
+for element in diffence_encod:
+    magnitude_dis=0
+    for sub_ele in element:
+        magnitude_dis+= sub_ele*sub_ele
+    magnitude_dis=math.sqrt(magnitude_dis)
+    dist_vect.append(magnitude_dis)
+
+print("dist vect", dist_vect,"\n")
+
+# magnitutde of input
+
+length_input_enc =0
+
+for element in face_encodings[0]:
+    length_input_enc += element*element
+
+
+
+
+
+
+
+# calculating cosine related
+
+
+thetas=[]
+products=[]
+for element in known_encodings:
+    magnitude_dis = 0
+    theta=0
+    dot_prod=0
+    for sub_ele, input_encod in zip(element,face_encodings[0]):
+        dot_prod += sub_ele*input_encod
+
+        magnitude_dis += sub_ele* sub_ele
+        magnitude_dis = math.sqrt(magnitude_dis)
+    products.append(dot_prod)
+    theta = math.acos(dot_prod/(abs(magnitude_dis) * abs(length_input_enc)))
+    thetas.append(theta)
+
+
+print("dotprodcts: ", products,"\n")
+print("\ntheta: ", thetas,"\n\n")
+
+print("face distace from library:", face_dis)
+#for element in diffence_encod:
+    #dis
+
+
+print("\n\n\n")
+test_image_path = os.path.join(dir, 'ravi bhandari.jpg')
+test_image = face_recognition.load_image_file(test_image_path)
+test_encod = face_recognition.face_encodings(test_image)
+print(test_encod[0])
+
+vec= face_encodings[0] - test_encod[0]
+
+dis = 0
+
+for element in vec:
+    dis += element*element
+
+dis = math.sqrt(dis)
+print("\nvec distance\t: ",dis)
+
+"""
+
+"""
+name='unknown'
+
+print('hel1')
+image = 'ravi.jpg'
+img = cv2.imread(image)
+face_locate = face_recognition.face_locations(img)
+#print(face_locate)
+face_encodings  = face_recognition.face_encodings(img)
+
+print(face_locate)
+print('hello\n')
+print("\n\n\nfaceencodeinputwala",face_encodings[0],"\n\n")
+c=0
+face_dis=[]
+for (top,left,right, bottom), face_encoding in zip(face_locate, face_encodings):
+    c+=1
+    face_dis = face_recognition.face_distance(known_encodings, face_encoding)
+    print("facedis\n face dis",face_dis)
+    best_match_index = np.argmin(face_dis)
+    #print(best_match_index)
+    c=best_match_index
+    name= known_names[best_match_index]
+    print("top \n", top, 'left\n', left, '\nright', right )
+
+   # cv2.rectangle(img, (left,top),(right, bottom), (0, 255, 0), 2)
+    #cv2.putText(img, name, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (50,225,178),5)
+
+print("\n\n\n",c)
+# cv2.imshow("Result", img)
+print(name[0])
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+"""
