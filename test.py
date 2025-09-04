@@ -111,13 +111,13 @@ cv.destroyAllWindows()
 import cv2 as cv
 import time
 # Find the file path (optional step if you know the file is local)
-filename = cv.samples.findFile('Aman.jpg')
+filename = cv.samples.findFile('Aman1.jpg')
 
 # Read the image in color
 src = cv.imread(filename, cv.IMREAD_COLOR)
 
 # Show the image
-cv.imshow('result', src)
+cv2.imshow('result', src)
 #t = round(time.time())
 
 kernel = np.array([[0, -2, 0],
@@ -188,7 +188,7 @@ import numpy as np
 import cv2 as cv
 #from matplotlib import pyplot as plt
 
-img = cv.imread('Aman.jpg', cv.IMREAD_GRAYSCALE)
+img = cv.imread('Aman1.jpg', cv.IMREAD_GRAYSCALE)
 
 # Initiate ORB detector
 orb = cv.ORB_create()
@@ -349,7 +349,7 @@ import face_recognition
 import cv2
 
 # Load image
-image = face_recognition.load_image_file("Aman.jpg")
+image = face_recognition.load_image_file("Aman1.jpg")
 
 # Convert RGB (face_recognition uses RGB) to BGR for OpenCV
 image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)

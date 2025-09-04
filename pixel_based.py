@@ -1,6 +1,6 @@
 #mean squared error
-""""
 
+"""
 import cv2
 import numpy as np
 import os
@@ -51,8 +51,8 @@ index_min= np.argmin(distances)
 
 
 print("\nnearest image: ", names[index_min])
-
 """
+
 
 # Structural Similarity Index
 
@@ -60,11 +60,11 @@ import numpy as np
 import cv2
 import os
 from skimage.metrics import structural_similarity as ssim
-
+import pandas as pd
 
 dir = 'Master_fold'
 test_gall = 'test'
-input_img = 'Sachin.png'
+input_img = 'AmanP.jpg'
 
 img_read = os.path.join(test_gall, input_img)
 img = cv2.imread(img_read)
@@ -104,7 +104,15 @@ print('\n matched name: ',names[max_index])
 
 
 
+df = pd.DataFrame({
+    "name": names,
+    "model distance": scores,
 
+})
+
+df.to_csv('pixel_based_SSIM.csv')
+
+df.to_excel('pixel_based_ssim.xlsx')
 
 
 

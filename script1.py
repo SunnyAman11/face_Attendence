@@ -139,10 +139,10 @@ def eucledean_func(img_name):
     return dist_vect
 
 
-model_dist= input_image('Aman.jpg')
-eucled_dist = eucledean_func('Aman.jpg')
+model_dist= input_image('Aman1.jpg')
+eucled_dist = eucledean_func('Aman1.jpg')
 
-cosine_dist= cosine_funct('Aman.jpg')
+cosine_dist= cosine_funct('Aman1.jpg')
 # check in test.py
 
 
