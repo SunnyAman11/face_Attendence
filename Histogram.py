@@ -1,3 +1,4 @@
+import time
 
 # Histogram Intersection
 
@@ -12,19 +13,11 @@ import math
 
 dir = 'Master_fold'
 test_gall = 'test'
-input_img = 'Akshay.png'
 
-img_read = os.path.join(test_gall, input_img)
-img = cv2.imread(img_read)
-test_img = cv2.resize(img, (500, 500))
-
-hist_test = cv2.calcHist([test_img], [0, 1, 2], None, [256, 256, 256], [0,256, 0,256, 0,256])
-hist_test = cv2.normalize(hist_test, hist_test).flatten()
 
 
 #print(hist_test,'\n')
 
-channels = cv2.split(test_img)
 
 # for chans in channels:
 #     print(chans,'\n')
@@ -36,73 +29,119 @@ hist_images = []
 names=[]
 
 hist_plot =[]
+inf_time={}
 
-for file in os.listdir(dir):
+Hist_data = {}
 
-
-    image_path = os.path.join(dir, file)
-
-    image = cv2.imread(image_path)
-
-    names.append(file)
-
-    image = cv2.resize(image, (500, 500))
-
-    hist_image = cv2.calcHist([image],[0,1,2], None,[256,256,256],[0,256,0,256,0,256])
-    hist_image = cv2.normalize(hist_image, hist_image).flatten()
-
-    # hist_plot.append(hist_image)
-
-    similarity = np.sum(np.minimum(hist_test, hist_image))
-
-    hist_images.append(similarity)
-
-
-
-for name, similar in zip(names, hist_images) :
-    print(name, similar,'\n')
-
-similar = np.argmax(hist_images)
-
-print('\nmatch with :', names[similar])
-
-df = pd.DataFrame({
-    "name": names,
-    "histogram similarity": hist_images,
-
-})
-
-df.to_csv('histogram_based_.csv')
-
-df.to_excel('histogram_based_.xlsx')
-
-
-print("\ntest image histogram\n")
-
+sum_data_time=0
 
 """
-for file in os.listdir(dir):
+for file_name in os.listdir(test_gall):
+    img_read = os.path.join(test_gall, file_name)
+    img = cv2.imread(img_read)
+    if img is None:
+        continue
+    test_img = cv2.resize(img, (500, 500))
+    t11= time.time()
+   # if len(test_img.shape) == 3 and test_img.shape[2] == 3:
+    hist_test = cv2.calcHist([test_img], [0, 1, 2], None, [256, 256, 256], [0, 256, 0, 256, 0, 256])
+
+    #hist_test = cv2.normalize(hist_test, hist_test).flatten()
+    t12= time.time()
+    Hist_data[file_name] = {}
+
+    inf_time[file_name]={}
+    sum_data_time += t12-t11
+
+    t=0
+
+    for file in os.listdir(dir):
+        image_path = os.path.join(dir, file)
+
+        image = cv2.imread(image_path)
+
+        names.append(file)
+
+        image = cv2.resize(image, (500, 500))
+
+        t21= time.time()
+        hist_image = cv2.calcHist([image],[0,1,2], None,[256,256,256],[0,256,0,256,0,256])
+       # hist_image = cv2.normalize(hist_image, hist_image).flatten()
+        t22= time.time()
+    # hist_plot.append(hist_image)
+
+        t1=t22 - t21
+        similarity = np.sum(np.minimum(hist_test, hist_image))
+
+        inf_time[file_name][file] = t1
+
+        Hist_data[file_name][file] = similarity
+"""
 
 
-    image_path = os.path.join(dir, file)
 
+sum=0
+"""
+print('\n\n')
+for test_img, master_dict in inf_time.items():
+    times=[]
+    print("test image: ",test_img,'time ')
+
+    for name,time in master_dict.items():
+        print(name,':',time*1000,'millisec')
+        #print(val)
+        times.append(time)
+        sum+=time
+
+print("total time :", sum+ sum_data_time*1000,'milli second')
+"""
+"""
+
+all_dfs = []
+
+for test_img, master_dict in Hist_data.items():
+    df = pd.DataFrame(master_dict, index=[test_img])
+    all_dfs.append(df)
+
+final_df = pd.concat(all_dfs)
+final_df.to_csv("Hist.csv")
+final_df.to_excel('Hist.xlsx')
+
+#df.to_csv('histogram_based_.csv')
+
+#df.to_excel('histogram_based_.xlsx')
+
+#correct matched 34 out of 49
+print("\ntest image histogram\n")
+"""
+
+
+# test images histogram
+"""
+for file in os.listdir(test_gall):
+
+    image_path = os.path.join(test_gall, file)
     image = cv2.imread(image_path)
     image = cv2.resize(image, (500, 500))
+
+    if image is None:
+        continue
+
     channels_data = cv2.split(image)
 
-    hist_image = cv2.calcHist([image], [0, 1, 2], None, [256, 256, 256], [0, 256, 0, 256, 0, 256])
-    for chan, color in zip(channels, colors):
+    for chan, color in zip(channels_data, colors):
         hist = cv2.calcHist([chan], [0], None, [256], [0, 256])
-        hist = cv2.normalize(hist, hist).flatten()
+
+        hist = cv2.normalize(hist, hist, alpha=0, beta=0.5, norm_type=cv2.NORM_MINMAX)
 
         plt.plot(hist, color=color)
         plt.xlim([0, 256])
 
-    plt.title(f"RGB Histogram of {file}")
+    plt.title(f"Normalized RGB Histogram of {file}")
     plt.xlabel("Pixel Intensity")
-    plt.ylabel("Frequency")
+    plt.ylabel("Normalized Frequency")
     plt.show()
-    
+
 """
 
 
@@ -124,7 +163,7 @@ plt.show()
 
 # Chisquare distance
 
-"""
+
 import pandas as pd
 import cv2
 import numpy as np
@@ -134,51 +173,87 @@ import math
 
 dir = 'Master_fold'
 test_gall = 'test'
-input_img = 'Akshay.png'
-
-img_read = os.path.join(test_gall, input_img)
-img = cv2.imread(img_read)
-test_img = cv2.resize(img, (500, 500))
-
-hist_test = cv2.calcHist([test_img], [0, 1, 2], None, [256, 256, 256], [0,256, 0,256, 0,256])
-hist_test = cv2.normalize(hist_test, hist_test, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
-
-#hist_test = hist_test.reshape(-1).astype(np.float32)
-
-print(hist_test.size,'\n')
 
 hist_images = []
 names=[]
 chi_sq=0
 
-for file in os.listdir(dir):
+inf_time={}
+
+Hist_data = {}
+
+sum_data_time=0
+
+for file_name in os.listdir(test_gall):
+    img_read = os.path.join(test_gall, file_name)
+    img = cv2.imread(img_read)
+    if img is None:
+        continue
+    test_img = cv2.resize(img, (500, 500))
+    t11= time.time()
+   # if len(test_img.shape) == 3 and test_img.shape[2] == 3:
+    hist_test = cv2.calcHist([test_img], [0, 1, 2], None, [256, 256, 256], [0, 256, 0, 256, 0, 256])
+
+    hist_test = cv2.normalize(hist_test, hist_test).flatten()
+    t12= time.time()
+    Hist_data[file_name] = {}
+
+    inf_time[file_name]={}
+    sum_data_time += t12-t11
 
 
-    image_path = os.path.join(dir, file)
+    for file in os.listdir(dir):
+        image_path = os.path.join(dir, file)
 
-    image = cv2.imread(image_path)
+        image = cv2.imread(image_path)
 
-    names.append(file)
+        names.append(file)
 
-    image = cv2.resize(image, (500, 500))
-
-    hist_image = cv2.calcHist([image], [0, 1, 2], None, [256, 256, 256], [0, 256, 0, 256, 0, 256])
+        image = cv2.resize(image, (500, 500))
+        t21 = time.time()
+        hist_image = cv2.calcHist([image], [0, 1, 2], None, [256, 256, 256], [0, 256, 0, 256, 0, 256])
     #hist_image = hist_image.reshape(-1).astype(np.float32)
-    hist_image= cv2.normalize(hist_image, hist_image, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+        hist_image= cv2.normalize(hist_image, hist_image, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX).flatten()
 
     # for
-    chi_sq = np.sum((hist_test - hist_image)**2 /(hist_test + hist_image+0.05))
+        chi_sq = np.sum((hist_test - hist_image)**2 /(hist_test + hist_image+0.05))
+        t22 = time.time()
+        hist_images.append(chi_sq)
+        chi_sq =0
+        t1 = t22 - t21
 
-    hist_images.append(chi_sq)
-    chi_sq =0
+        inf_time[file_name][file] = t1
 
-for name, similar in zip(names, hist_images) :
-    print(name, similar,'\n')
+        #Hist_data[file_name][file] = chi_sq
 
-similar = np.argmin(hist_images)
 
-print('\nmatch with :', names[similar])
 
+
+for test_img, master_dict in inf_time.items():
+    times=[]
+    print("test image: ",test_img,'time ')
+
+    for name,time in master_dict.items():
+        print(name,':',time*1000,'millisec')
+        #print(val)
+        times.append(time)
+        sum+=time
+
+
+print("total time :", sum+ sum_data_time*1000,'milli second')
+
+
+
+
+
+
+#for name, similar in zip(names, hist_images) :
+ #   print(name, similar,'\n')
+
+#similar = np.argmin(hist_images)
+
+#print('\nmatch with :', names[similar])
+"""
 df = pd.DataFrame({
     "name": names,
     "hist_similarity": hist_images,
